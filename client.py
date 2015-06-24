@@ -1,6 +1,7 @@
 #/usr/bin/python
 import shodan
 import argparse
+import sys
 
 #Define Shodan variables
 SHODAN_API_KEY = "API_KEY"
@@ -8,11 +9,11 @@ api = shodan.Shodan(SHODAN_API_KEY)
 
 #Define argument options
 parser = argparse.ArgumentParser(description="An API client for the Shodan framework.")
-parser.add_argument('-k', '--keyword', help='a keyword to search')
-parser.add_argument('-t', '--target', help='a target ip address to search')
+parser.add_argument('-k', '--keyword', nargs=1, default=False, help='a keyword to search')
+parser.add_argument('-t', '--target', nargs=1, default=False, help='a target ip address to search')
 
-parser.add_argument('-v', '--verbose', action='start_true', help='show more information')
-parser.parse_args()
+parser.add_argument('-v', '--verbose', action='store_true', help='show more information')
+args = parser.parse_args()
 def keywordSearch(keyword):
     try:
         #Search Shodan
@@ -42,7 +43,7 @@ def targetSearch(target):
             IP: %s
             Organization: %s
             Operating System: %s
-        """ % (host['ip_str'], host.get['org', 'n/a'), host.get('os', 'n/a'))
+        """ % (host['ip_str'], host.get('org', 'n/a'), host.get('os', 'n/a'))
         if args.verbose:
             #Print all banners
             print """
@@ -56,6 +57,10 @@ def targetSearch(target):
 if __name__ == "__main__":
     if args.keyword and args.target:
         print "Cannot search both a keyword and a target!"
-        break
+        sys.exit()
     if args.keyword:
         #keyword funtion
+        keywordSearch(args.keyword)
+    if args.target:
+        #target function
+        targetSearch(args.target)
